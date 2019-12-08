@@ -6,6 +6,7 @@ USE_NGINX_MAX_UPLOAD=${NGINX_MAX_UPLOAD:-0}
 
 # Get the number of workers for Nginx, default to 1
 USE_NGINX_WORKER_PROCESSES=${NGINX_WORKER_PROCESSES:-1}
+echo "Using nginx worker processes: $USE_NGINX_WORKER_PROCESSES"
 
 # Set the max number of connections per worker for Nginx, if requested 
 # Cannot exceed worker_rlimit_nofile, see NGINX_WORKER_OPEN_FILES below
@@ -13,6 +14,7 @@ NGINX_WORKER_CONNECTIONS=${NGINX_WORKER_CONNECTIONS:-1024}
 
 # Get the listen port for Nginx, default to 80
 USE_LISTEN_PORT=${LISTEN_PORT:-80}
+echo "Using listen port: $USE_LISTEN_PORT"
 
 if [ -f /app/nginx.conf ]; then
     cp /app/nginx.conf /etc/nginx/nginx.conf
@@ -49,6 +51,8 @@ else
     content_server=$content_server'    location / {\n'
     content_server=$content_server'        include uwsgi_params;\n'
     content_server=$content_server'        uwsgi_pass unix:///tmp/uwsgi.sock;\n'
+    content_server=$content_server'        proxy_request_buffering off;\n'
+    content_server=$content_server'        proxy_buffering off;\n'
     content_server=$content_server'    }\n'
     content_server=$content_server'}\n'
     # Save generated server /etc/nginx/conf.d/nginx.conf
